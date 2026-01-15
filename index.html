@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Buddha Machine</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Web Buddha Machine</h1>
+
+      <div class="player">
+        <button id="playButton" class="play-button">
+          <span class="play-icon">&#9658;</span>
+        </button>
+
+        <div class="controls">
+          <label for="speedSlider">再生速度</label>
+          <input
+            type="range"
+            id="speedSlider"
+            min="0.25"
+            max="2"
+            step="0.05"
+            value="1"
+          />
+          <span id="speedValue">1.00x</span>
+        </div>
+      </div>
+
+      <p class="hint">音声ファイルを public/loop.mp3 に配置してください</p>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
