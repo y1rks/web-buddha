@@ -7,8 +7,11 @@ const speedSlider = document.getElementById("speedSlider") as HTMLInputElement;
 const speedValue = document.getElementById("speedValue") as HTMLSpanElement;
 
 // Tone.js Playerの作成
+// Viteのベースパスを考慮（GitHub Pages対応）
+const audioUrl = `${import.meta.env.BASE_URL}loop.mp3`;
+
 const player = new Tone.Player({
-  url: "/loop.mp3",
+  url: audioUrl,
   loop: true,
   onload: () => {
     console.log("音声ファイルが読み込まれました");
