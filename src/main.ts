@@ -96,7 +96,16 @@ async function togglePlayback() {
       isPlaying = true;
       playButton.classList.add("playing");
       playIcon.innerHTML = "&#9632;";
-      log("Started playback");
+      log(`Started playback`);
+      log(`Player state: ${player.state}`);
+      log(`Player volume: ${player.volume.value}dB`);
+      log(`Destination volume: ${Tone.getDestination().volume.value}dB`);
+
+      // 1秒後に状態を再確認
+      setTimeout(() => {
+        log(`After 1s - Player state: ${player.state}`);
+        log(`After 1s - Context state: ${Tone.getContext().state}`);
+      }, 1000);
     } catch (e) {
       log(`Playback error: ${e}`);
     }
