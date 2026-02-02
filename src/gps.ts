@@ -8,7 +8,7 @@ export interface GpsState {
   errorMessage: string;
 }
 
-const SMOOTHING_FACTOR = 0.6;
+const SMOOTHING_FACTOR = 1.0; // 1.0 = no smoothing, use raw distance directly
 const DEAD_ZONE = 1; // meters
 const PERIOD = 8; // meters
 const SPEED_MIN = 0.25;
@@ -90,8 +90,8 @@ export function startGpsTracking(
     },
     {
       enableHighAccuracy: true,
-      maximumAge: 2000,
-      timeout: 15000,
+      maximumAge: 0,
+      timeout: 5000,
     },
   );
 
