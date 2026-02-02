@@ -8,6 +8,7 @@ const dist = resolve("dist");
 const variants = [
   { name: "v1" },
   { name: "v2", audioFile: "korogari.mp3" },
+  { name: "v2.2", audioFile: "matataki.mp3" },
 ];
 
 // GPS UI markup to replace the slider controls in v2
@@ -39,8 +40,8 @@ for (const { name, audioFile } of variants) {
     .replace(/<title>Web Buddha Machine<\/title>/, `<title>Web Buddha Machine ${name}</title>`)
     .replace(/<h1>Web Buddha Machine<\/h1>/, `<h1>Web Buddha Machine ${name}</h1>`);
 
-  // v2: inject data-variant and replace slider with GPS UI
-  if (name === "v2") {
+  // v2 variants: inject data-variant and replace slider with GPS UI
+  if (name.startsWith("v2")) {
     html = html.replace("<body>", '<body data-variant="v2">');
     html = html.replace(
       sliderControlsRegex,
