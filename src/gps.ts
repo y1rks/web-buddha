@@ -8,9 +8,9 @@ export interface GpsState {
   errorMessage: string;
 }
 
-const SMOOTHING_FACTOR = 1.0; // 1.0 = no smoothing, use raw distance directly
-const DEAD_ZONE = 0; // meters
-const PERIOD = 4; // meters
+const SMOOTHING_FACTOR = 0.3;
+const DEAD_ZONE = 5; // meters – absorbs GPS jitter when stationary
+const PERIOD = 15; // meters
 const SPEED_MIN = 0.25;
 const SPEED_MAX = 2.0;
 
@@ -31,7 +31,9 @@ export function haversineDistance(
 }
 
 export function distanceToSpeed(distance: number): number {
-  // Sine wave: 0m→1.0x, 1m→2.0x, 2m→1.0x, 3m→0.25x, 4m→1.0x
+  if (distance < DEAD_ZONE) return 1.0;
+
+  // Sine wave mapped from dead zone edge
   const mid = (SPEED_MAX + SPEED_MIN) / 2; // 1.125
   const amp = (SPEED_MAX - SPEED_MIN) / 2; // 0.875
   const phase = ((distance - DEAD_ZONE) / PERIOD) * 2 * Math.PI;
@@ -88,8 +90,8 @@ export function startGpsTracking(
     },
     {
       enableHighAccuracy: true,
-      maximumAge: 0,
-      timeout: 5000,
+      maximumAge: 2000,
+      timeout: 10000,
     },
   );
 
