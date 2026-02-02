@@ -7,7 +7,7 @@ const dist = resolve("dist");
 // Per-variant config: audioFile overrides loop.mp3 if specified
 const variants = [
   { name: "v1" },
-  { name: "v2", audioFile: "korogari.mp3" },
+  { name: "v2.1", audioFile: "korogari.mp3" },
   { name: "v2.2", audioFile: "matataki.mp3" },
 ];
 
