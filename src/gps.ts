@@ -9,8 +9,8 @@ export interface GpsState {
 }
 
 const SMOOTHING_FACTOR = 1.0; // 1.0 = no smoothing, use raw distance directly
-const DEAD_ZONE = 1; // meters
-const PERIOD = 8; // meters
+const DEAD_ZONE = 0; // meters
+const PERIOD = 4; // meters
 const SPEED_MIN = 0.25;
 const SPEED_MAX = 2.0;
 
@@ -31,9 +31,7 @@ export function haversineDistance(
 }
 
 export function distanceToSpeed(distance: number): number {
-  if (distance < DEAD_ZONE) return 1.0;
-
-  // Sine wave: 0m→1.0x, 2m→2.0x, 4m→1.0x, 6m→0.25x, 8m→1.0x
+  // Sine wave: 0m→1.0x, 1m→2.0x, 2m→1.0x, 3m→0.25x, 4m→1.0x
   const mid = (SPEED_MAX + SPEED_MIN) / 2; // 1.125
   const amp = (SPEED_MAX - SPEED_MIN) / 2; // 0.875
   const phase = ((distance - DEAD_ZONE) / PERIOD) * 2 * Math.PI;
