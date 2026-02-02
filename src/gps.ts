@@ -9,8 +9,8 @@ export interface GpsState {
 }
 
 const SMOOTHING_FACTOR = 0.3;
-const DEAD_ZONE = 10; // meters
-const PERIOD = 100; // meters
+const DEAD_ZONE = 3; // meters
+const PERIOD = 20; // meters
 const SPEED_MIN = 0.25;
 const SPEED_MAX = 2.0;
 
@@ -33,7 +33,7 @@ export function haversineDistance(
 export function distanceToSpeed(distance: number): number {
   if (distance < DEAD_ZONE) return 1.0;
 
-  // Sine wave: 0m→1.0x, 50m→2.0x, 100m→1.0x, 150m→0.25x, 200m→1.0x
+  // Sine wave: 0m→1.0x, 5m→2.0x, 10m→1.0x, 15m→0.25x, 20m→1.0x
   const mid = (SPEED_MAX + SPEED_MIN) / 2; // 1.125
   const amp = (SPEED_MAX - SPEED_MIN) / 2; // 0.875
   const phase = ((distance - DEAD_ZONE) / PERIOD) * 2 * Math.PI;
