@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:multi": "tsc && vite build && node scripts/copy-variants.mjs",
     "preview": "vite preview"
   },
   "keywords": [],
