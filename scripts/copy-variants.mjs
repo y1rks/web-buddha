@@ -10,6 +10,22 @@ const variants = [
   { name: "v2", audioFile: "korogari.mp3" },
 ];
 
+// GPS UI markup to replace the slider controls in v2
+const gpsControlsHtml = `
+        <div class="controls">
+          <div id="gpsStatus" class="gps-status idle">GPS待機中</div>
+          <div class="distance-display" id="distanceDisplay">0.0 m</div>
+          <div class="speed-display" id="speedDisplay">1.00x</div>
+          <div class="gps-debug">
+            緯度: <span id="debugLat">--</span><br>
+            経度: <span id="debugLon">--</span><br>
+            精度: <span id="debugAccuracy">--</span><br>
+            生距離: <span id="debugRawDist">--</span>
+          </div>
+        </div>`;
+
+const sliderControlsRegex = /<div class="controls">[\s\S]*?<\/div>\s*<\/div>\s*(<\/div>)/;
+
 // Copy dist to a temp directory first to avoid self-copy error
 const tmp = mkdtempSync(resolve(tmpdir(), "web-buddha-"));
 cpSync(dist, tmp, { recursive: true });
@@ -19,9 +35,19 @@ for (const { name, audioFile } of variants) {
 
   // Rewrite title and h1 for each variant
   const htmlPath = resolve(dist, name, "index.html");
-  const html = readFileSync(htmlPath, "utf-8")
+  let html = readFileSync(htmlPath, "utf-8")
     .replace(/<title>Web Buddha Machine<\/title>/, `<title>Web Buddha Machine ${name}</title>`)
     .replace(/<h1>Web Buddha Machine<\/h1>/, `<h1>Web Buddha Machine ${name}</h1>`);
+
+  // v2: inject data-variant and replace slider with GPS UI
+  if (name === "v2") {
+    html = html.replace("<body>", '<body data-variant="v2">');
+    html = html.replace(
+      sliderControlsRegex,
+      gpsControlsHtml + "\n      $1",
+    );
+  }
+
   writeFileSync(htmlPath, html);
 
   // Override audio file if specified

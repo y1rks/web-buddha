@@ -123,3 +123,67 @@ h1 {
   font-size: 0.75rem;
   opacity: 0.5;
 }
+
+/* GPS UI (v2) */
+.gps-status {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 0.8rem;
+}
+
+.gps-status.idle {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.gps-status.acquiring {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  animation: blink 1s ease-in-out infinite;
+}
+
+.gps-status.active {
+  background: rgba(78, 204, 163, 0.2);
+  color: #4ecca3;
+}
+
+.gps-status.error {
+  background: rgba(233, 69, 96, 0.2);
+  color: #e94560;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.distance-display {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+  color: #fff;
+}
+
+.speed-display {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #e94560;
+  margin-bottom: 1rem;
+}
+
+.gps-debug {
+  font-size: 0.7rem;
+  opacity: 0.5;
+  line-height: 1.6;
+  text-align: left;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.gps-debug span {
+  font-family: "SF Mono", "Fira Code", monospace;
+}
