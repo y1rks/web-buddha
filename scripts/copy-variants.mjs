@@ -1,4 +1,4 @@
-import { cpSync, mkdtempSync, rmSync, writeFileSync } from "fs";
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { tmpdir } from "os";
 
@@ -11,6 +11,13 @@ cpSync(dist, tmp, { recursive: true });
 
 for (const variant of variants) {
   cpSync(tmp, resolve(dist, variant), { recursive: true });
+
+  // Rewrite title and h1 for each variant
+  const htmlPath = resolve(dist, variant, "index.html");
+  const html = readFileSync(htmlPath, "utf-8")
+    .replace(/<title>Web Buddha Machine<\/title>/, `<title>Web Buddha Machine ${variant}</title>`)
+    .replace(/<h1>Web Buddha Machine<\/h1>/, `<h1>Web Buddha Machine ${variant}</h1>`);
+  writeFileSync(htmlPath, html);
 }
 
 rmSync(tmp, { recursive: true });
