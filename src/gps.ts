@@ -40,6 +40,13 @@ export function distanceToSpeed(distance: number): number {
   return mid + amp * Math.sin(phase);
 }
 
+/** Map distance to EQ balance: -1.0 (bass) … 0.0 (flat) … +1.0 (treble) */
+export function distanceToEqBalance(distance: number): number {
+  if (distance < DEAD_ZONE) return 0.0;
+  const phase = ((distance - DEAD_ZONE) / PERIOD) * 2 * Math.PI;
+  return Math.sin(phase);
+}
+
 export function startGpsTracking(
   callback: (state: GpsState) => void,
 ): () => void {

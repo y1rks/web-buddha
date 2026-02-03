@@ -187,3 +187,55 @@ h1 {
 .gps-debug span {
   font-family: "SF Mono", "Fira Code", monospace;
 }
+
+/* EQ UI (v3) */
+.eq-balance-display {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #e94560;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.15em;
+}
+
+.eq-bar-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  height: 12px;
+  width: 200px;
+  margin: 0 auto 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.eq-bar-low {
+  position: absolute;
+  right: 50%;
+  height: 100%;
+  width: 0%;
+  background: #e94560;
+  border-radius: 6px 0 0 6px;
+  transition: width 0.3s ease;
+}
+
+.eq-bar-high {
+  position: absolute;
+  left: 50%;
+  height: 100%;
+  width: 0%;
+  background: #4ecca3;
+  border-radius: 0 6px 6px 0;
+  transition: width 0.3s ease;
+}
+
+.eq-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 200px;
+  margin: 0 auto 0.5rem;
+  font-size: 0.65rem;
+  opacity: 0.5;
+}

@@ -1,7 +1,8 @@
 import * as Tone from "tone";
-import { startGpsTracking, type GpsState } from "./gps";
+import { startGpsTracking, distanceToEqBalance, type GpsState } from "./gps";
 
 const isV2 = document.body.dataset.variant === "v2";
+const isV3 = document.body.dataset.variant === "v3";
 
 // DOM要素の取得
 const playButton = document.getElementById("playButton") as HTMLButtonElement;
@@ -22,7 +23,29 @@ const player = new Tone.Player({
     playButton.disabled = false;
     playButton.style.opacity = "1";
   },
-}).toDestination();
+});
+
+// v3: EQ3 + lowpass filter chain; others: direct to destination
+let eq3: Tone.EQ3 | null = null;
+let lpFilter: Tone.Filter | null = null;
+
+if (isV3) {
+  eq3 = new Tone.EQ3({
+    low: 0,
+    mid: 0,
+    high: 0,
+    lowFrequency: 250,
+    highFrequency: 2500,
+  });
+  lpFilter = new Tone.Filter({
+    type: "lowpass",
+    frequency: 18000,
+    rolloff: -24,
+  });
+  player.chain(eq3, lpFilter, Tone.getDestination());
+} else {
+  player.toDestination();
+}
 
 let isPlaying = false;
 
@@ -84,6 +107,107 @@ if (isV2) {
 
     // Update playback rate
     player.playbackRate = state.speed;
+  }
+
+  async function togglePlayback() {
+    if (!player.loaded) return;
+
+    const contextReady = await ensureAudioContext();
+    if (!contextReady) return;
+
+    if (isPlaying) {
+      player.stop();
+      isPlaying = false;
+      playButton.classList.remove("playing");
+      playIcon.innerHTML = "&#9658;";
+      if (stopGps) {
+        stopGps();
+        stopGps = null;
+      }
+    } else {
+      player.start();
+      isPlaying = true;
+      playButton.classList.add("playing");
+      playIcon.innerHTML = "&#9632;";
+      stopGps = startGpsTracking(updateGpsUi);
+    }
+  }
+
+  playButton.addEventListener("click", togglePlayback);
+} else if (isV3) {
+  // --- v3: GPS-controlled EQ ---
+  const gpsStatus = document.getElementById("gpsStatus") as HTMLElement;
+  const distanceDisplay = document.getElementById(
+    "distanceDisplay",
+  ) as HTMLElement;
+  const eqBalanceDisplay = document.getElementById(
+    "eqBalanceDisplay",
+  ) as HTMLElement;
+  const eqBarLow = document.getElementById("eqBarLow") as HTMLElement;
+  const eqBarHigh = document.getElementById("eqBarHigh") as HTMLElement;
+  const debugLat = document.getElementById("debugLat") as HTMLElement;
+  const debugLon = document.getElementById("debugLon") as HTMLElement;
+  const debugAccuracy = document.getElementById("debugAccuracy") as HTMLElement;
+  const debugRawDist = document.getElementById("debugRawDist") as HTMLElement;
+
+  let stopGps: (() => void) | null = null;
+
+  function applyEqBalance(balance: number) {
+    if (!eq3 || !lpFilter) return;
+
+    // EQ3 gains: balance -1 = bass-heavy, +1 = treble-heavy
+    eq3.low.value = -15 * balance;
+    eq3.mid.value = -3;
+    eq3.high.value = 15 * balance;
+
+    // Lowpass filter sweep (logarithmic): 800Hz … 18000Hz
+    const logMin = Math.log(800);
+    const logMax = Math.log(18000);
+    const t = (balance + 1) / 2; // map -1..+1 to 0..1
+    lpFilter.frequency.value = Math.exp(logMin + t * (logMax - logMin));
+  }
+
+  function updateGpsUi(state: GpsState) {
+    // Status indicator
+    gpsStatus.className = "gps-status " + state.status;
+    const statusLabels: Record<GpsState["status"], string> = {
+      idle: "GPS待機中",
+      acquiring: "GPS取得中...",
+      active: "GPS有効",
+      error: "GPSエラー",
+    };
+    gpsStatus.textContent = statusLabels[state.status];
+    if (state.status === "error" && state.errorMessage) {
+      gpsStatus.textContent += `: ${state.errorMessage}`;
+    }
+
+    // Distance
+    distanceDisplay.textContent = `${state.smoothedDistance.toFixed(1)} m`;
+
+    // EQ balance
+    const balance = distanceToEqBalance(state.smoothedDistance);
+    applyEqBalance(balance);
+
+    // UI labels
+    let label: string;
+    if (balance < -0.3) label = "BASS";
+    else if (balance > 0.3) label = "TREBLE";
+    else label = "FLAT";
+    eqBalanceDisplay.textContent = label;
+
+    // Balance bar widths
+    const lowPct = Math.max(0, -balance) * 50;
+    const highPct = Math.max(0, balance) * 50;
+    eqBarLow.style.width = `${lowPct}%`;
+    eqBarHigh.style.width = `${highPct}%`;
+
+    // Debug info
+    if (state.current) {
+      debugLat.textContent = state.current.lat.toFixed(6);
+      debugLon.textContent = state.current.lon.toFixed(6);
+      debugAccuracy.textContent = `${state.current.accuracy.toFixed(1)} m`;
+    }
+    debugRawDist.textContent = `${state.rawDistance.toFixed(1)} m`;
   }
 
   async function togglePlayback() {

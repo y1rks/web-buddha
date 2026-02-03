@@ -11,6 +11,8 @@ const variants = [
   { name: "v1.2", audioFile: "matataki.mp3" },
   { name: "v2.1", audioFile: "korogari.mp3" },
   { name: "v2.2", audioFile: "matataki.mp3" },
+  { name: "v3.1", audioFile: "korogari.mp3" },
+  { name: "v3.2", audioFile: "matataki.mp3" },
 ];
 
 // GPS UI markup to replace the slider controls in v2
@@ -19,6 +21,25 @@ const gpsControlsHtml = `
           <div id="gpsStatus" class="gps-status idle">GPS待機中</div>
           <div class="distance-display" id="distanceDisplay">0.0 m</div>
           <div class="speed-display" id="speedDisplay">1.00x</div>
+          <div class="gps-debug">
+            緯度: <span id="debugLat">--</span><br>
+            経度: <span id="debugLon">--</span><br>
+            精度: <span id="debugAccuracy">--</span><br>
+            生距離: <span id="debugRawDist">--</span>
+          </div>
+        </div>`;
+
+// EQ UI markup for v3 variants
+const eqControlsHtml = `
+        <div class="controls">
+          <div id="gpsStatus" class="gps-status idle">GPS待機中</div>
+          <div class="distance-display" id="distanceDisplay">0.0 m</div>
+          <div class="eq-balance-display" id="eqBalanceDisplay">FLAT</div>
+          <div class="eq-bar-container">
+            <div class="eq-bar-low" id="eqBarLow"></div>
+            <div class="eq-bar-high" id="eqBarHigh"></div>
+          </div>
+          <div class="eq-bar-labels"><span>BASS</span><span>TREBLE</span></div>
           <div class="gps-debug">
             緯度: <span id="debugLat">--</span><br>
             経度: <span id="debugLon">--</span><br>
@@ -48,6 +69,15 @@ for (const { name, audioFile } of variants) {
     html = html.replace(
       sliderControlsRegex,
       gpsControlsHtml + "\n      $1",
+    );
+  }
+
+  // v3 variants: inject data-variant and replace slider with EQ UI
+  if (name.startsWith("v3")) {
+    html = html.replace("<body>", '<body data-variant="v3">');
+    html = html.replace(
+      sliderControlsRegex,
+      eqControlsHtml + "\n      $1",
     );
   }
 
