@@ -44,7 +44,7 @@ export function distanceToSpeed(distance: number): number {
 export function distanceToEqBalance(distance: number): number {
   if (distance < DEAD_ZONE) return 0.0;
   const phase = ((distance - DEAD_ZONE) / PERIOD) * 2 * Math.PI;
-  return Math.sin(phase);
+  return Math.cos(phase);
 }
 
 export function startGpsTracking(
