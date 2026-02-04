@@ -80,16 +80,21 @@ if (isV2) {
   let stopGps: (() => void) | null = null;
 
   let bypassed = false;
+  let lastGpsState: GpsState | null = null;
   const bypassToggle = document.getElementById("bypassToggle") as HTMLInputElement;
   bypassToggle.addEventListener("change", () => {
     bypassed = bypassToggle.checked;
     if (bypassed) {
       player.playbackRate = 1.0;
       speedDisplay.textContent = "1.00x";
+    } else if (lastGpsState) {
+      player.playbackRate = lastGpsState.speed;
+      speedDisplay.textContent = `${lastGpsState.speed.toFixed(2)}x`;
     }
   });
 
   function updateGpsUi(state: GpsState) {
+    lastGpsState = state;
     // Status indicator
     gpsStatus.className = "gps-status " + state.status;
     const statusLabels: Record<GpsState["status"], string> = {
@@ -165,6 +170,7 @@ if (isV2) {
   let stopGps: (() => void) | null = null;
 
   let bypassed = false;
+  let lastGpsState: GpsState | null = null;
   const bypassToggle = document.getElementById("bypassToggle") as HTMLInputElement;
   bypassToggle.addEventListener("change", () => {
     bypassed = bypassToggle.checked;
@@ -173,6 +179,14 @@ if (isV2) {
       eqBalanceDisplay.textContent = "FLAT";
       eqBarLow.style.width = "0%";
       eqBarHigh.style.width = "0%";
+    } else if (lastGpsState) {
+      const balance = distanceToEqBalance(lastGpsState.smoothedDistance);
+      applyEqBalance(balance);
+      if (balance < -0.3) eqBalanceDisplay.textContent = "BASS";
+      else if (balance > 0.3) eqBalanceDisplay.textContent = "TREBLE";
+      else eqBalanceDisplay.textContent = "FLAT";
+      eqBarLow.style.width = `${Math.max(0, -balance) * 50}%`;
+      eqBarHigh.style.width = `${Math.max(0, balance) * 50}%`;
     }
   });
 
@@ -192,6 +206,8 @@ if (isV2) {
   }
 
   function updateGpsUi(state: GpsState) {
+    lastGpsState = state;
+
     // Status indicator
     gpsStatus.className = "gps-status " + state.status;
     const statusLabels: Record<GpsState["status"], string> = {
