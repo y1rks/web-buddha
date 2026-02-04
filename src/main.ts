@@ -79,6 +79,16 @@ if (isV2) {
 
   let stopGps: (() => void) | null = null;
 
+  let bypassed = false;
+  const bypassToggle = document.getElementById("bypassToggle") as HTMLInputElement;
+  bypassToggle.addEventListener("change", () => {
+    bypassed = bypassToggle.checked;
+    if (bypassed) {
+      player.playbackRate = 1.0;
+      speedDisplay.textContent = "1.00x";
+    }
+  });
+
   function updateGpsUi(state: GpsState) {
     // Status indicator
     gpsStatus.className = "gps-status " + state.status;
@@ -95,7 +105,6 @@ if (isV2) {
 
     // Distance & speed
     distanceDisplay.textContent = `${state.smoothedDistance.toFixed(1)} m`;
-    speedDisplay.textContent = `${state.speed.toFixed(2)}x`;
 
     // Debug info
     if (state.current) {
@@ -105,8 +114,11 @@ if (isV2) {
     }
     debugRawDist.textContent = `${state.rawDistance.toFixed(1)} m`;
 
-    // Update playback rate
-    player.playbackRate = state.speed;
+    // Update playback rate (skip when bypassed)
+    if (!bypassed) {
+      player.playbackRate = state.speed;
+      speedDisplay.textContent = `${state.speed.toFixed(2)}x`;
+    }
   }
 
   async function togglePlayback() {
@@ -152,6 +164,18 @@ if (isV2) {
 
   let stopGps: (() => void) | null = null;
 
+  let bypassed = false;
+  const bypassToggle = document.getElementById("bypassToggle") as HTMLInputElement;
+  bypassToggle.addEventListener("change", () => {
+    bypassed = bypassToggle.checked;
+    if (bypassed) {
+      applyEqBalance(0);
+      eqBalanceDisplay.textContent = "FLAT";
+      eqBarLow.style.width = "0%";
+      eqBarHigh.style.width = "0%";
+    }
+  });
+
   function applyEqBalance(balance: number) {
     if (!eq3 || !lpFilter) return;
 
@@ -184,22 +208,24 @@ if (isV2) {
     // Distance
     distanceDisplay.textContent = `${state.smoothedDistance.toFixed(1)} m`;
 
-    // EQ balance
-    const balance = distanceToEqBalance(state.smoothedDistance);
-    applyEqBalance(balance);
+    // EQ balance (skip when bypassed)
+    if (!bypassed) {
+      const balance = distanceToEqBalance(state.smoothedDistance);
+      applyEqBalance(balance);
 
-    // UI labels
-    let label: string;
-    if (balance < -0.3) label = "BASS";
-    else if (balance > 0.3) label = "TREBLE";
-    else label = "FLAT";
-    eqBalanceDisplay.textContent = label;
+      // UI labels
+      let label: string;
+      if (balance < -0.3) label = "BASS";
+      else if (balance > 0.3) label = "TREBLE";
+      else label = "FLAT";
+      eqBalanceDisplay.textContent = label;
 
-    // Balance bar widths
-    const lowPct = Math.max(0, -balance) * 50;
-    const highPct = Math.max(0, balance) * 50;
-    eqBarLow.style.width = `${lowPct}%`;
-    eqBarHigh.style.width = `${highPct}%`;
+      // Balance bar widths
+      const lowPct = Math.max(0, -balance) * 50;
+      const highPct = Math.max(0, balance) * 50;
+      eqBarLow.style.width = `${lowPct}%`;
+      eqBarHigh.style.width = `${highPct}%`;
+    }
 
     // Debug info
     if (state.current) {

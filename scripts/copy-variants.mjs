@@ -15,9 +15,18 @@ const variants = [
   { name: "v3.2", audioFile: "matataki.mp3" },
 ];
 
+const bypassToggleHtml = `
+          <div class="bypass-container">
+            <label class="bypass-label" for="bypassToggle">オリジナル</label>
+            <label class="bypass-switch">
+              <input type="checkbox" id="bypassToggle">
+              <span class="bypass-slider"></span>
+            </label>
+          </div>`;
+
 // GPS UI markup to replace the slider controls in v2
 const gpsControlsHtml = `
-        <div class="controls">
+        <div class="controls">${bypassToggleHtml}
           <div id="gpsStatus" class="gps-status idle">GPS待機中</div>
           <div class="distance-display" id="distanceDisplay">0.0 m</div>
           <div class="speed-display" id="speedDisplay">1.00x</div>
@@ -31,7 +40,7 @@ const gpsControlsHtml = `
 
 // EQ UI markup for v3 variants
 const eqControlsHtml = `
-        <div class="controls">
+        <div class="controls">${bypassToggleHtml}
           <div id="gpsStatus" class="gps-status idle">GPS待機中</div>
           <div class="distance-display" id="distanceDisplay">0.0 m</div>
           <div class="eq-balance-display" id="eqBalanceDisplay">FLAT</div>

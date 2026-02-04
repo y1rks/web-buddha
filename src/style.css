@@ -239,3 +239,63 @@ h1 {
   font-size: 0.65rem;
   opacity: 0.5;
 }
+
+/* Bypass toggle (v2/v3) */
+.bypass-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.bypass-label {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.bypass-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.bypass-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.bypass-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  transition: background 0.3s;
+}
+
+.bypass-slider::before {
+  content: "";
+  position: absolute;
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.bypass-switch input:checked + .bypass-slider {
+  background: #4ecca3;
+}
+
+.bypass-switch input:checked + .bypass-slider::before {
+  transform: translateX(20px);
+}
